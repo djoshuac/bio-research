@@ -11,15 +11,20 @@ ui <- bootstrapPage(
 
 server <- function(input, output, session) {
 
+  points <- reactive({
+    p <- input$map_click
+    if (length(p) > 0) cbind(p$lng, p$lat) else cbind(-110.0589, 42.3601)
+  })
+
   output$map <- renderLeaflet({
     leaflet() %>%
       addProviderTiles(input$basemap) %>%
       setView(lng = -110.0589, lat = 42.3601, zoom = 5)
   })
 
-  observeEvent(input$map_click, {
-    p <- input$map_click
-    print(p)
+  observe({
+    leafletProxy("map") %>%
+      addMarkers(data = points())
   })
 }
 
